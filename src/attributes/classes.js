@@ -6,7 +6,8 @@ define([
 	"../core/init"
 ], function( jQuery, rnotwhite, strundefined, data_priv ) {
 
-var rclass = /[\t\r\n\f]/g;
+var rclass = /[\t\r\n\f]/g,
+	hasClassList = document.documentElement.classList != null;
 
 jQuery.fn.extend({
 	addClass: function( value ) {
@@ -142,12 +143,25 @@ jQuery.fn.extend({
 	},
 
 	hasClass: function( selector ) {
-		var className = " " + selector + " ",
+		var elem, className,
 			i = 0,
 			l = this.length;
+
+		if ( !hasClassList ) {
+			className = " " + selector + " ";
+		}
+
 		for ( ; i < l; i++ ) {
-			if ( this[i].nodeType === 1 && (" " + this[i].className + " ").replace(rclass, " ").indexOf( className ) >= 0 ) {
-				return true;
+			elem = this[ i ];
+
+			if ( elem.nodeType === 1 ) {
+				if ( hasClassList ) {
+					if ( elem.classList.contains( selector ) ) {
+						return true;
+					}
+				} else if ( (" " + elem.className + " ").replace( rclass, " " ).indexOf( className ) >= 0 ) {
+					return true;
+				}
 			}
 		}
 
